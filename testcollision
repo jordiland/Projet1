@@ -1,0 +1,238 @@
+#-------------------------------------------------------------------------------
+# Name:        module1
+# Purpose:
+#
+# Author:      jordiland
+#
+# Created:     02/10/2016
+# Copyright:   (c) jordiland 2016
+# Licence:     <your licence>
+#-------------------------------------------------------------------------------
+
+import pygame
+from random import randint
+
+#Variables
+pygame.init()
+gameOver = False
+
+#GameState
+onGame = True
+onPause = False
+
+
+#menu------
+onMenu = True
+onJouer = False
+onOption = False
+
+boutonSelect = 1
+
+bouton1 = pygame.Rect(300, 350, 200, 50)
+bouton2 = pygame.Rect(300, 420, 200, 50)
+
+marron = (150,60,60)
+flop = (134,215,59)
+jaune = (255,255,0)
+rouge = (255,0,0)
+
+
+#Player
+playerPosX = 10
+playerPosY = 10
+
+playerW = 28
+playerH = 48
+
+playerVelocity = 2
+
+
+#img = player------------------------------------------------------------------
+
+img = True
+#-------------
+
+playerMoveUp = False
+playerMoveDown = False
+playerMoveLeft = False
+playerMoveRight = False
+playerIsWalking = False
+playerRun = False
+
+player = pygame.Rect(playerPosX, playerPosY,playerW, playerH)
+
+#attaque---*/-*/-*/-*/-*/-*/-*/-*/-*/-*/-*/
+
+
+#Objects
+
+
+
+#image
+
+img = pygame.image.load("Img/persoD.png")
+
+
+maison = pygame.Rect(100, 100, 200, 200)
+
+#Monsters
+
+monsterPosX = 500
+monsterPosY = 200
+monsterW = 90
+monsterH = 90
+
+monster = pygame.Rect(100, 100, 200, 200)
+
+#===============================================================================
+#Creation Fenetre===============================================================
+
+
+game = pygame.display.set_mode((800,600))
+pygame.display.set_caption("Jeu")
+
+
+
+#===============================================================================
+#Corps du jeu===================================================================
+
+clock = pygame.time.Clock()
+
+while not gameOver:
+
+#EVENEMENTS=====================================================================
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            gameOver = True
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:#HAUT
+                playerMoveUp = True
+            if event.key == pygame.K_s:#BAS
+                playerMoveDown = True
+            if event.key == pygame.K_a:#GAUCHE
+                playerMoveLeft = True
+            if event.key == pygame.K_d:#DROITE
+                playerMoveRight = True
+            if event.key == pygame.K_ESCAPE:#ECHAP | Quitte le jeu
+                gameOver = True
+            if event.key == pygame.K_LSHIFT:#ECHAP | Quitte le jeu
+                playerRun = True
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_w:#HAUT
+                playerMoveUp = False
+            if event.key == pygame.K_s:#BAS
+                playerMoveDown = False
+            if event.key == pygame.K_a:#GAUCHE
+                playerMoveLeft = False
+            if event.key == pygame.K_d:#DROITE
+                playerMoveRight = False
+            if event.key == pygame.K_LSHIFT:#ECHAP | Quitte le jeu
+                playerRun = False
+
+
+
+
+
+#GGGGGGRRRRROOOOOOSSSSSSLLLLAAAAAAGGGGGGG-+-+--+-+--+-+-++++--++++--+++-+-++++-+
+#------------------------
+
+        if onMenu :
+            game.fill(flop)
+
+        if boutonSelect == 1:
+            couleurBouton1 = rouge
+            couleurBouton2 = jaune
+        if boutonSelect == 2:
+            couleurBouton1 = jaune
+            couleurBouton2 = rouge
+
+
+        if onMenu == True:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    boutonSelect = 2
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    boutonSelect = 1
+                if event.key == pygame.K_RETURN:
+                    if boutonSelect == 1:
+                        onMenu = False
+                        onOption = False
+                        onJouer = True
+
+                if event.key == pygame.K_RETURN:
+                    if boutonSelect == 2:
+                        onMenu = False
+                        onOption = True
+                        onJouer = False
+
+
+
+            pygame.draw.rect(game, couleurBouton1, bouton1, 6)
+            pygame.draw.rect(game, couleurBouton2, bouton2, 6)
+
+        if onJouer :
+            game.fill((255,255,255))
+            game.blit(img,(playerPosX,playerPosY))
+            pygame.draw.rect(game, (255,0,0), player, 1)
+            pygame.draw.rect(game, (5,0,0), monster, 2)
+            pygame.draw.rect(game, (5,0,0), maison, 2)
+
+
+
+                                                #------------+-+-+-+-+-+-++-+-+-
+#+-+-+-+--+-+---+-++++++++++-++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+
+
+
+
+#UPDATE=========================================================================
+
+    if playerMoveUp:#========================================================
+        if playerRun:
+            player.move_ip(0, -playerVelocity*2)#                           #
+        else:
+            player.move_ip(0, -playerVelocity)#                             #
+    if playerMoveDown:                          #                           #
+        if playerRun:
+            player.move_ip(0, +playerVelocity*2)#                           #
+
+        else:
+            player.move_ip(0, +playerVelocity)#             DEPLACEMENT     #
+    if playerMoveLeft:                          #             DU            #
+        if playerRun:
+            player.move_ip(-playerVelocity*2, 0)#           JOUEUR          #
+        else:
+            player.move_ip(-playerVelocity, 0)#                             #
+    if playerMoveRight:                         #                           #
+        if playerRun:
+            player.move_ip(+playerVelocity*2, 0)#
+        else:
+            player.move_ip(+playerVelocity, 0)#==============================
+#collisionmaison--------------------------------------------------------
+    if player.colliderect(maison):
+        playerMoveUp = False
+        playerMoveDown = False
+        playerMoveLeft = False
+        playerMoveRight = False
+        playerIsWalking = False
+        playerRun = False
+#---------------------------------------------------------------------------
+
+
+    monster.move_ip(0, 1)
+#DRAW===========================================================================
+    #game.fill((255,255,255))
+    #game.blit(img,(playerPosX,playerPosY))         # JAI MIS EN # POUR AFFICHER  onJouer
+    #pygame.draw.rect(game, (255,0,0), player, 1)
+    #pygame.draw.rect(game, (5,0,0), monster, 2)
+    #pygame.draw.rect(game, (5,0,0), maison, 2)
+#===============================================================================
+    pygame.display.update()#Rafraichissement de l'ecran
+    clock.tick(30)#Taux d'image/secondes
+
+
+pygame.quit()
+quit()
