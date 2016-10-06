@@ -1,0 +1,238 @@
+#-------------------------------------------------------------------------------
+
+import pygame
+from random import randint
+
+#Variables
+pygame.init()
+gameOver = False
+
+#GameState
+onGame = True
+onPause = False
+
+
+#menu------
+onMenu = True
+onJouer = False
+onOption = False
+
+
+
+bouton1 = pygame.Rect(300, 350, 200, 50)
+bouton2 = pygame.Rect(300, 420, 200, 50)
+
+marron = (150,60,60)
+flop = (134,215,59)
+jaune = (255,255,0)
+rouge = (255,0,0)
+bleu = (0,0,255)
+
+#Player
+playerPosX = 10
+playerPosY = 10
+
+playerW = 28
+playerH = 48
+
+playerVelocity = 2
+
+
+#img = player------------------------------------------------------------------
+
+
+
+onInterieur = False
+#-------------
+
+playerMoveUp = False
+playerMoveDown = False
+playerMoveLeft = False
+playerMoveRight = False
+playerIsWalking = False
+playerRun = False
+
+player = pygame.Rect(playerPosX, playerPosY,playerW, playerH)
+
+#attaque---*/-*/-*/-*/-*/-*/-*/-*/-*/-*/-*/
+
+
+#Objects
+
+maisonposX = 200
+maisonposY = 250
+
+#image
+
+img = pygame.image.load("Img/persoD.png")
+
+
+maison = pygame.Rect(200, 250, 265, 190)
+interieur =pygame.Rect(300,390,50,50)
+
+
+#interieurdlamaison------
+
+imgmaison = pygame.image.load("Img/maison.png")
+
+
+
+#Monsters
+
+monsterPosX = 500
+monsterPosY = 200
+monsterW = 50
+monsterH = 50
+monsterDestX = 350
+monsterDestY = 350
+
+
+
+monster = pygame.Rect(100, 100, 70, 70)
+
+#===============================================================================
+#Creation Fenetre===============================================================
+
+
+game = pygame.display.set_mode((1200,800))
+pygame.display.set_caption("Jeu")
+
+
+
+#===============================================================================
+#Corps du jeu===================================================================
+
+clock = pygame.time.Clock()
+
+while not gameOver:
+
+#EVENEMENTS=====================================================================
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            gameOver = True
+
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_w:#HAUT
+                playerMoveUp = True
+                game.blit(img,(playerPosX,playerPosY))
+            if event.key == pygame.K_s:#BAS
+                playerMoveDown = True
+                game.blit(img,(playerPosX,playerPosY))
+            if event.key == pygame.K_a:#GAUCHE
+                playerMoveLeft = True
+                game.blit(img,(playerPosX,playerPosY))
+            if event.key == pygame.K_d:#DROITE
+                playerMoveRight = True
+                game.blit(img,(playerPosX,playerPosY))
+            if event.key == pygame.K_ESCAPE:#ECHAP | Quitte le jeu
+                gameOver = True
+                game.blit(img,(playerPosX,playerPosY))
+            if event.key == pygame.K_LSHIFT:#ECHAP | Quitte le jeu
+                playerRun = True
+                game.blit(img,(playerPosX,playerPosY))
+
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_w:#HAUT
+                playerMoveUp = False
+            if event.key == pygame.K_s:#BAS
+                playerMoveDown = False
+            if event.key == pygame.K_a:#GAUCHE
+                playerMoveLeft = False
+            if event.key == pygame.K_d:#DROITE
+                playerMoveRight = False
+            if event.key == pygame.K_LSHIFT:#ECHAP | Quitte le jeu
+                playerRun = False
+
+
+
+#UPDATE=========================================================================
+
+    if playerMoveUp:#========================================================
+        if playerRun:
+            player.move_ip(0, -playerVelocity*2)#                           #
+        else:
+            player.move_ip(0, -playerVelocity)#                             #
+    if playerMoveDown:                          #                           #
+        if playerRun:
+            player.move_ip(0, +playerVelocity*2)#                           #
+        else:
+            player.move_ip(0, +playerVelocity)#             DEPLACEMENT     #
+    if playerMoveLeft:                          #             DU            #
+        if playerRun:
+            player.move_ip(-playerVelocity*2, 0)#           JOUEUR          #
+        else:
+            player.move_ip(-playerVelocity, 0)#                             #
+    if playerMoveRight:                         #                           #
+        if playerRun:
+            player.move_ip(+playerVelocity*2, 0)#
+        else:
+            player.move_ip(+playerVelocity, 0)#==============================
+
+
+        if player.colliderect(interieur):
+            onInterieur = True
+            onMenu = False
+
+    if player.colliderect(interieur):
+        onInterieur = True
+        onMenu = False
+        pygame.display.update()
+
+
+#collisionmaison--------------------------------------------------------
+    if player.colliderect(maison):
+        playerMoveUp = False
+        playerMoveDown = False
+        playerMoveLeft = False
+        playerMoveRight = False
+        playerIsWalking = False
+        playerRun = False
+#---------------------------------------------------------------------------
+    #Deplacement monstre
+    if monster.x < monsterDestX:
+        monster.move_ip(1, 0)
+    elif monster.x > monsterDestX:
+        monster.move_ip(-1, 0)
+    elif monster.y < monsterDestY:
+        monster.move_ip(0, 1)
+    elif monster.y > monsterDestY:
+        monster.move_ip(0, -1)
+    elif monster.x == monsterDestX and monster.y == monsterDestY:
+        monsterDestX = randint(350, 510)
+        monsterDestY = randint(350, 510)
+
+    #Affichage position monstre
+    print()
+    print("Destination: ",monsterDestX, " | ",monsterDestY )
+    print("Position: ", monster.x, " | ", monster.y)
+
+
+#DRAW===========================================================================
+    if onInterieur:
+        pygame.display.update()
+        onMenu= False
+        game.fill((240,128,45))
+        pygame.draw.rect(game, (255,10,0), player, 1)
+        playerVelocity = 6
+
+
+
+
+    if onMenu:
+        game.fill((255,255,255))
+        game.blit(img,(playerPosX,playerPosY))         # JAI MIS EN # POUR AFFICHER  onJouer
+        game.blit(imgmaison,(maisonposX,maisonposY))
+        pygame.draw.rect(game, (255,0,0), player, 1)
+        pygame.draw.rect(game, (5,0,0), monster, 2)
+        pygame.draw.rect(game, (5,0,0), maison, 2)
+
+
+
+
+#===============================================================================
+    pygame.display.update()#Rafraichissement de l'ecran
+    clock.tick(20)#Taux d'image/secondes
+
+
+pygame.quit()
+quit()
